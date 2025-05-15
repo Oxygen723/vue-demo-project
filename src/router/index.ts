@@ -1,0 +1,39 @@
+import { createRouter, createWebHashHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHashHistory(`/${import.meta.env.VITE_SYS_NAME}/`),
+  routes: [
+    {
+      path: '/',
+      redirect: '/login',
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/login/index.vue'),
+    },
+    {
+      path: '/:path(.*)',
+      name: '404',
+      component: () => import('@/views/Error_404/index.vue'),
+    }
+  ],
+})
+
+// 添加路由守卫
+router.beforeEach((to, from, next) => {
+  // 如果用户访问的是登录页，直接放行
+  if (to.path === '/login') {
+    next()
+    return
+  }
+  // 如果用户访问的不是登录页，则需要判断用户是否登录
+  const token = localStorage.getItem('token')
+  if (token) {
+    next()
+  } else {
+    next('/login')
+  }
+})
+
+export default router

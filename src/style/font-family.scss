@@ -1,0 +1,44 @@
+// 项目中使用的字体
+@font-face {
+  font-family: 'AlimamaShuHeiTi';
+  src: url('../assets/font/AlimamaShuHeiTi.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DouYinMeiHao';
+  src: url('../assets/font/douYinMeiHao.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OPPOSans-Regular';
+  src: url('../assets/font/OPPOSans-Regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PangMenZhengDao';
+  src: url('../assets/font/PangMenZhengDao.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.SANS {
+  font-family: 'Open Sans-Regular';
+}
+
+.ALSH {
+  font-family: 'AlimamaShuHeiTi';
+}
+
+.OPPO {
+  font-family: 'OPPOSansRegular';
+}
+
+.PMZD {
+  font-family: 'PangMenZhengDao';
+}

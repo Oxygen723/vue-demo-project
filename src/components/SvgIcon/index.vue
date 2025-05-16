@@ -1,5 +1,5 @@
 <template>
-  <svg aria-hidden="true" class="svg-icon" :class="svgClass">
+  <svg aria-hidden="true" :class="svgClass" :style="{ width: width, height: height }">
     <use :xlink:href="symbolId" :fill="color" />
   </svg>
 </template>
@@ -34,15 +34,15 @@ const props = defineProps({
 
 const symbolId = computed(() => `#${props.prefix}-${props.name}`)
 
-const svgClass = () => {
+const svgClass = computed(() => {
   if (props.className) {
     return `svg-icon ${props.className}`
   } else {
     return 'svg-icon'
   }
-}
+})
 </script>
-<style scoped lang="scss">
+<style lang="scss">
 .svg-icon {
   width: 1em;
   height: 1em;

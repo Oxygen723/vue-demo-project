@@ -1,4 +1,113 @@
-// 组件库的自定义样式
-:root {
+// element 组件样式
+html body {
   --el-color-primary: var(--theme-color);
+  --el-text-color-primary: var(--theme-color);
+  --el-bg-color-overlay: var(--tip-bg-color);
+  --el-border-color-light: var(--tip-border-color);
+  --el-fill-color-blank: rgba(0, 0, 0, 0);
+  --el-text-color-regular: #ffffff;
+  --el-fill-color-light: var(--header-row-color);
+  --el-border-color: var(--container-border-color);
+  --el-border-color-hover: var(--theme-color);
+  --el-bg-color: var(--tip-bg-color);
+  --el-border-color-lighter :var(--tip-border-color);
+
+  .el-dropdown-menu__item:not(.is-disabled):hover {
+    background-color: var(--header-row-color);
+  }
+
+  .el-button--primary {
+    --el-button-text-color:#000;
+  }
+
+  .el-button {
+    &:hover {
+      --el-button-hover-bg-color: var(--header-row-color);
+      border-color: var(--theme-color);
+    }
+    &:active {
+      --el-button-active-bg-color: var(--header-row-color);
+      border-color: var(--theme-color);
+    }
+  }
+
+  .el-message-box {
+    --el-messagebox-border-radius:10px;
+    --el-messagebox-box-shadow:var(--message-box-shadow);
+    border:1px solid var(--container-border-color);
+    .el-message-box__title {
+      font-family: "DouYinMeiHao";
+    }
+  }
+
+  .el-date-range-picker {
+    --el-datepicker-inrange-bg-color:var(--border-color);
+    --el-datepicker-inrange-hover-bg-color:var(--container-border-color);
+  }
+
+  .el-picker__popper {
+    --el-datepicker-border-color: var(--container-border-color);
+  }
+
+  .el-date-picker {
+    --el-datepicker-icon-color: var(--theme-color);
+  }
+
+  .el-date-table th,
+  .el-date-picker__header--bordered {
+    border-bottom: 1px solid var(--container-border-color);
+  }
+
+  .el-pagination.is-background .el-pager li {
+    background-color: var(--side-nav-border-color);
+    color: #ffffff;
+    &.is-active {
+      color: #000;
+    }
+  }
+  .el-pagination.is-background .btn-prev:disabled,
+  .el-pagination.is-background .btn-next:disabled,
+  .el-pagination.is-background .btn-prev,
+  .el-pagination.is-background .btn-next {
+    background-color: var(--row-bg-color);
+    border: 1px solid var(--container-border-color);
+    color: #ffffff;
+  }
+
+  .el-checkbox {
+    --el-checkbox-checked-icon-color: #000;
+  }
+
+  .el-table {
+    --el-table-bg-color: rgba(0, 0, 0, 0);
+    --el-table-header-bg-color: var(--header-row-color);
+    --el-table-tr-bg-color: var(--row-bg-color);
+    --el-table-border-color: var(--border-color);
+    --el-table-header-text-color: var(--theme-color);
+    --el-table-row-hover-bg-color: var(--row-hover-bg-color);
+    --el-table-text-color: #d8d8d8;
+    --el-table-current-row-bg-color: var(--row-hover-bg-color);
+    --el-table-expanded-cell-bg-color: rgba(0, 0, 0, 0.3);
+  }
+
+  .el-table .el-table__body {
+    -webkit-border-vertical-spacing: 10px;
+  }
+
+  .el-table th.el-table__cell.is-leaf,
+  .el-table td.el-table__cell {
+    border-bottom: none;
+  }
+
+  .el-table__header-wrapper {
+    border-radius: 6px;
+  }
+
+  .headerCellClass {
+    font-size: 14px;
+  }
+
+  .bodyCellClass {
+    font-size: 13px;
+  }
 }

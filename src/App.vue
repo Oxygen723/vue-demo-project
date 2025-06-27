@@ -10,11 +10,12 @@ import autofit from 'autofit.js';
 
 
 const screenFunction = (dh: number = 932) => {
+  const html: HTMLElement = document.querySelector('html') as HTMLElement;
   nextTick(() => {
     // 监听浏览器窗口尺寸变化
     autofit.init({
-      dh: dh,
-      dw: 1920,
+      dh: html.clientHeight,
+      dw: html.clientWidth,
       el: "html",
       resize: true
     })

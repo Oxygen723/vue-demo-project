@@ -11,15 +11,15 @@ export interface resultPage<T> {
   total: number
 }
 export enum REAR {
-  '后端1' = '云泉',
-  '后端2' = '德纵',
-  '后端3' = '阳俊'
+  '后端1' = '后端1',
+  '后端2' = '后端2',
+  '后端3' = '后端3'
 }
 
 // 默认生产服务器地址
 const prodBaseUrl = 'https://dz.szdjct.com'
 // 默认测试服务器地址
-const testBaseUrl = 'http://192.168.10.46'
+const testBaseUrl = 'http://test46.szdjct.com'
 
 // 各个后端服务器地址
 const baseUrl = {

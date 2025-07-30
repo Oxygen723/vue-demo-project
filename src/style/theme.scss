@@ -4,7 +4,7 @@
   --theme-color: rgba(var(--theme-color-value),1); // 项目主题颜色
   --header-row-color: rgba(var(--theme-color-value), 0.5);
   --tip-bg-color: #18474d;
-    --tip-border-color: rgba(var(--theme-color-value), 0.6);
+  --tip-border-color: rgba(var(--theme-color-value), 0.6);
   --container-bg-color: rgba(0, 33, 29, 0.7);
   --container-border-color: rgba(var(--theme-color-value), 0.4);
 }
@@ -14,7 +14,7 @@ html[theme="one"] {
   --theme-color: rgba(var(--theme-color-value),1);
   --tip-bg-color: #18474d;
   // --header-bg:url(../assets/images/header-bg.webp) no-repeat center;
-    --tip-border-color: rgba(var(--theme-color-value), 0.6);
+  --tip-border-color: rgba(var(--theme-color-value), 0.6);
   --side-nav-border-color: rgba(var(--theme-color-value), 0.4);
   --container-bg-color: rgba(0, 33, 29, 0.5);
   --container-border-color: rgba(var(--theme-color-value), 0.4);

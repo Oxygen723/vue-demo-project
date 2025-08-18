@@ -121,3 +121,12 @@ export const downloadFileByBlob = (
   document.body.removeChild(link);
   URL.revokeObjectURL(downloadUrl);
 };
+
+/**
+ * ## 判断数字是否为正数，并返回对应的颜色
+ * @param number
+ * @returns
+ */
+export const minMaxColor = (number: number) => {
+  return number <= 0 ? "#26E28E" : "#FE3930";
+};

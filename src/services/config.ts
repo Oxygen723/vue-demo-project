@@ -24,19 +24,19 @@ const testBaseUrl = "http://test46.szdjct.com";
 // 各个后端服务器地址
 const baseUrl = {
   开发: {
-    [REAR.后端1]: "rearDevUrl",
-    [REAR.后端2]: "rearDevUrl",
-    [REAR.后端3]: "rearDevUrl",
+    [REAR.后端1]: "yourDevUrl",
+    [REAR.后端2]: "yourDevUrl",
+    [REAR.后端3]: "yourDevUrl",
   },
   生产: {
-    [REAR.后端1]: "rearProdUrl",
-    [REAR.后端2]: "rearProdUrl",
-    [REAR.后端3]: "rearProdUrl",
+    [REAR.后端1]: prodBaseUrl,
+    [REAR.后端2]: prodBaseUrl,
+    [REAR.后端3]: prodBaseUrl,
   },
   测试: {
-    [REAR.后端1]: "rearTestUrl",
-    [REAR.后端2]: "rearTestUrl",
-    [REAR.后端3]: "rearTestUrl",
+    [REAR.后端1]: testBaseUrl,
+    [REAR.后端2]: testBaseUrl,
+    [REAR.后端3]: testBaseUrl,
   },
 };
 

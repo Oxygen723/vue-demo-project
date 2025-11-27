@@ -130,3 +130,23 @@ export const downloadFileByBlob = (
 export const minMaxColor = (number: number) => {
   return number <= 0 ? "#26E28E" : "#FE3930";
 };
+
+/**
+ * 获取url参数
+ * @param {*} key
+ */
+export const getQueryString = (key: any) => {
+  const { href: url } = window.location;
+  const hash = url.substring(url.indexOf("#") + 1);
+  const searchIndex = hash.indexOf("?");
+  const search = searchIndex > -1 ? hash.substring(searchIndex) : "";
+  const query = new URLSearchParams(search);
+  if (Array.isArray(key)) {
+    const obj: any = {};
+    key.forEach((item) => {
+      obj[item] = query.get(item) || "";
+    });
+    return obj;
+  }
+  return query.get(key);
+};

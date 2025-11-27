@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build && node ./src/build/build.js",
+    "dev:test": "vite --mode test",
+    "build": "vite build && node ./src/build/build.js",
     "build:not-ts": "vite build && node ./src/build/build.js",
-    "build:test": "npm run build:not-ts --mode test",
-    "build:prod": "npm run build --mode prod",
+    "build:test": "vite build --mode test && node ./src/build/build.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@djct/aio-sdk": "^1.1.4",
     "autofit.js": "^3.2.8",
     "axios": "^1.9.0",
     "dayjs": "^1.11.13",
@@ -27,6 +28,7 @@
     "@types/node": "^20.17.47",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
+    "crypto-js": "^4.2.0",
     "fast-glob": "^3.3.3",
     "sass-embedded": "^1.88.0",
     "typescript": "~5.8.3",

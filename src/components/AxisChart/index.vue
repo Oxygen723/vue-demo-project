@@ -63,7 +63,7 @@ const updateChart = () => {
 watch(() => props.option, () => {
   if (chartInstance) updateChart()
   else initChart()
-}, { immediate: true, deep: true })
+}, { deep: true })
 
 </script>
 <style scoped lang="scss"></style>

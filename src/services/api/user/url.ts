@@ -1,5 +1,6 @@
 const url = {
-  login: '/share/user/login_auth_check' // 登录
-}
+  login: "/user/login/auth", // 登录
+  checkLogin:"/user/login/getAuthInfo" // 检查登录状态
+};
 
-export default url
+export default url;

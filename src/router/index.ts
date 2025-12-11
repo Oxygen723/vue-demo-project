@@ -1,24 +1,27 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const router = createRouter({
   history: createWebHashHistory(`/${import.meta.env.VITE_SYS_NAME}/`),
   routes: [
     {
-      path: '/',
-      redirect: '/login',
+      path: "/",
+      redirect: "/login",
     },
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/Login/index.vue'),
+      path: "/login",
+      name: "login",
+      component: () => import("@/views/Login/index.vue"),
+      meta: {
+        title: "登录页",
+      },
     },
     {
-      path: '/:path(.*)',
-      name: '404',
-      component: () => import('@/views/Error_404/index.vue'),
-    }
+      path: "/:path(.*)",
+      name: "404",
+      component: () => import("@/views/Error_404/index.vue"),
+    },
   ],
-})
+});
 
 // 添加路由守卫
 // router.beforeEach((to, from, next) => {
@@ -36,4 +39,4 @@ const router = createRouter({
 //   }
 // })
 
-export default router
+export default router;

@@ -45,14 +45,13 @@ onMounted(async () => {
     setAuthState(true)
     const path = "/" + to.replace(/ /g, "/");
     await router.push(to ? path : "/nav");
-    return
   } catch (error) {
     console.log(error);
   }
 
-  if (userId && authorization) {
+  if (authorization) {
     try {
-      await loginCheck({ authorization, userId });
+      await loginCheck({ authorization, userId: '' });
       setAuthState(true)
       const path = "/" + to.replace(/ /g, "/");
       await router.push(to ? path : "/nav");
@@ -64,7 +63,6 @@ onMounted(async () => {
       });
       clearState();
       router.push("/login");
-      return;
     }
   } else {
     // 如果没上面的俩参数 就判断本地是否有userId和token 只要一个没有就跳转登录 , 否则跳转走路由重定向首页
@@ -72,14 +70,14 @@ onMounted(async () => {
     const storedUserId = localStorage.getItem("userId");
 
     // 如果没有本地的userId和token 就跳转登录
-    if (!(storedAuthorization && storedUserId)) {
+    if (!(storedAuthorization)) {
       router.push("/login");
       // 如果这两个都有就调用check token 函数判断是否token是否过期
     } else {
       try {
         await loginCheck({
           authorization: storedAuthorization,
-          userId: storedUserId,
+          userId: '',
         });
         setAuthState(true)
       } catch (error: any) {

@@ -5,7 +5,7 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      redirect: "/login",
+      redirect: "/nav",
     },
     {
       path: "/login",
@@ -13,6 +13,14 @@ const router = createRouter({
       component: () => import("@/views/Login/index.vue"),
       meta: {
         title: "登录页",
+      },
+    },
+    {
+      path: "/nav",
+      name: "nav",
+      component: () => import("@/views/Nav/index.vue"),
+      meta: {
+        title: "首页",
       },
     },
     {

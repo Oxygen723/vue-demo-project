@@ -72,9 +72,10 @@ const request = axios.create({
 request.interceptors.request.use(
   (config) => {
     const authorization = sessionStorage.getItem("authorization");
-    config.headers["Login-Source"] = import.meta.env.VITE_SYS_NAME;
+    // config.headers["Login-Source"] = import.meta.env.VITE_SYS_NAME;
+    // config.headers["Login-Source"] = import.meta.env.VITE_SYS_NAME;
     if (authorization) {
-      config.headers["Finance-Token"] = authorization;
+      config.headers["culture-token"] = authorization;
     }
     return config;
   },

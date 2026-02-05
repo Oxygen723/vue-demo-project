@@ -3,6 +3,62 @@ import { resTableDataItem } from "./types";
 import { VxeColumnProps, VxeGridPropTypes, VxeTableDefines } from "vxe-table";
 
 /**
+ * ## 深拷贝函数
+ * @param value 待拷贝的值
+ * @param hashMap 用于处理循环引用的对象
+ * @returns 拷贝后的值
+ */
+export const deepCopy = (value: any, hashMap = new WeakMap()) => {
+  // 处理null、undefined、基本数据类型（string, number, boolean）以及函数和Symbol
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    typeof value === "function" ||
+    typeof value === "symbol"
+  ) {
+    return value;
+  }
+
+  // 检查是否已经处理过该对象（循环引用检测）
+  if (hashMap.has(value)) {
+    return hashMap.get(value);
+  }
+
+  let copy: any;
+
+  // 根据值的类型创建新的实例
+  if (Array.isArray(value)) {
+    copy = [];
+  } else if (value instanceof Date) {
+    copy = new Date(value);
+  } else if (value instanceof RegExp) {
+    copy = new RegExp(value);
+  } else if (value instanceof Map) {
+    copy = new Map();
+    value.forEach((item, key) => {
+      copy.set(deepCopy(key, hashMap), deepCopy(item, hashMap));
+    });
+  } else if (value instanceof Set) {
+    copy = new Set();
+    value.forEach((item) => {
+      copy.add(deepCopy(item, hashMap));
+    });
+  } else {
+    copy = {};
+  }
+
+  // 将新实例存入hashMap，以处理可能的循环引用
+  hashMap.set(value, copy);
+
+  // 递归复制所有可枚举属性
+  Reflect.ownKeys(value).forEach((key) => {
+    copy[key] = deepCopy(value[key], hashMap);
+  });
+
+  return copy;
+};
+
+/**
  * ## 根据单元格横竖表头id查找对应单元格详情
  * @param resTableData
  * @param cell
@@ -386,7 +442,7 @@ export const getDefaultColumns = (
   return Array.from({ length: maxLevel }, (_, index) => {
     const level = index + 1;
     const isLastLevel = level === maxLevel;
-    
+
     // 确定当前列的标题
     let title = "";
     if (Array.isArray(colName)) {
@@ -394,7 +450,7 @@ export const getDefaultColumns = (
     } else if (typeof colName === "string") {
       title = isLastLevel ? colName : "";
     }
-    
+
     return {
       field: `customField_${level}`,
       title,

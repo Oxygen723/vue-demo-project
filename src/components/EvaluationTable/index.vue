@@ -8,9 +8,8 @@
 import { ref, reactive, watch, nextTick } from 'vue';
 import { VxeColumnPropTypes, VxeGridInstance, VxeGridListeners, VxeGridProps, VxeTableDefines } from 'vxe-table';
 import { VxeInputProps } from 'vxe-pc-ui'
-import { findCellData, getDefaultColumns, MergeConfigItem, processTableDataDynamic, TargetItem, transformTableDataToTargetFormat } from './tools';
+import { deepCopy, findCellData, getDefaultColumns, MergeConfigItem, processTableDataDynamic, TargetItem, transformTableDataToTargetFormat } from './tools';
 import { HeadItem, resTableDataItem } from './types';
-import { deepCopy } from '@/utils/common';
 
 const props = withDefaults(defineProps<{
   // 横/竖模式
@@ -33,6 +32,8 @@ const props = withDefaults(defineProps<{
   cellEditSetting?: (data: { row: any, rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number }) => boolean
   // 自定义单元格类
   cellClassName?: (data: { row: any, rowIndex: number, $rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, $columnIndex: number }) => string
+  // 自定义表头类
+  headerCellClassName?: (data: { $rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, $columnIndex: number }) => string
   // 表格行列合并补充配置
   mergeAddition?: (data: { column: VxeTableDefines.ColumnInfo<any>, rowData: any[], columnsLength: number[][] }) => MergeConfigItem[]
 }>(), {
@@ -54,7 +55,11 @@ const gridRef = ref<VxeGridInstance<any>>()
 const gridOptions = reactive<VxeGridProps<any>>({
   border: true,
   height: '100%',
-  headerCellClassName: 'ALPH',
+  headerCellClassName: ({ $rowIndex, column, columnIndex, $columnIndex }) => {
+    let defaultClass = 'ALPH';
+    const newClass = props.headerCellClassName?.({ $rowIndex, column, columnIndex, $columnIndex }) ?? ''
+    return defaultClass + ' ' + newClass
+  },
   showHeaderOverflow: true,
   cellClassName: 'ALPH',
   editConfig: {
@@ -112,7 +117,10 @@ const gridEvents: VxeGridListeners<any> = {
   }
 }
 
-// 导出excel
+/**
+ * ## 导出表格数据
+ * @param filename 文件名
+ */
 const exportExcel = async (filename: string) => {
   const _table = gridRef.value
   if (!_table) return

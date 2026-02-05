@@ -8,7 +8,8 @@
           tableLayout
         }}</el-button>
       <el-button type="info" size="small"
-        @click="isFullView ? exitFullScreen() : fullScreenElement('.demo-nav-main')">{{ isFullView ? '退出全屏' : '全屏' }}</el-button>
+        @click="isFullView ? exitFullScreen() : fullScreenElement('.demo-nav-main')">{{ isFullView ? '退出全屏' : '全屏'
+        }}</el-button>
     </div>
     <div class="table-main w-100% h-[calc(100%-32px)]">
       <Loading v-if="loading"></Loading>
@@ -113,7 +114,7 @@ const getTableData = async () => {
 }
 
 onBeforeMount(() => {
-  const authorization = '69trYYx5n0IVM2RP8tJ96hTWvqkGejST64AREuwHi9HTpeYFmuF8QugdUPyJEJ6iZmnFZZpn7DyaxFA1HOTrGaJlKCWaCkOy4hA5ImaIlHMisoRkmI5evAuKLVFCVfnu'
+  const authorization = 'QJ1qkyvDxaFkixHxO0wI6uw0KvGU4No16xozORJsq1eeM6KSlqtVidqorkEH33ar3YEHAyfYAKMpUVeoAWTaOkcx85UtK5AS3InoP8c9TRCIo1H2EcSRzxyXtutLlgbV'
   sessionStorage.setItem('authorization', authorization)
 })
 

@@ -32,6 +32,23 @@ app.mount("#app");
 
 ### 组件属性
 
+| 属性名              | 类型         | 默认值                                        | 说明                                                                                                                                       |
+| ------------------- | ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| layout              | string       | 'vertical'                                    | 横/竖模式                                                                                                                                  |
+| data                | object       | { tableData: [], colHeads: [], rowHeads: [] } | 表格数据                                                                                                                                   |
+| colName             | array/string | []                                            | 固定列标题                                                                                                                                 |
+| colWidth            | array        | [100, 100]                                    | 固定列宽度                                                                                                                                 |
+| endEdit             | function     | () => Promise.resolve()                       | 结束单元格编辑的回调，参数：{ row: any, rowIndex: number, column: ColumnInfo, columnIndex: number, resCellData: resTableDataItem \| null } |
+| cellEditSetting     | function     | () => true                                    | 单元格是否能触发编辑，参数：{ row: any, rowIndex: number, column: ColumnInfo, columnIndex: number }                                        |
+| cellClassName       | function     | () => ''                                      | 自定义单元格类，参数：{ row: any, rowIndex: number, $rowIndex: number, column: ColumnInfo, columnIndex: number, $columnIndex: number }     |
+| headerCellClassName | function     | () => ''                                      | 自定义表头类，参数：{ column: ColumnInfo, columnIndex: number }                                                                            |
+| mergeAddition       | function     | () => []                                      | 表格行列合并补充配置，参数：{ rowData: any[], columns: ColumnInfo[] }                                                                      |
+
+### 组件方法
+
+| 方法名      | 参数             | 返回值        | 说明                    |
+| ----------- | ---------------- | ------------- | ----------------------- |
+| exportExcel | filename: string | Promise<void> | 导出表格数据到Excel文件 |
 
 ### 自定义样式
 

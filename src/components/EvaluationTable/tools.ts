@@ -373,30 +373,34 @@ export function processTableDataDynamic(data: TableItem[]): ProcessedResult {
 /**
  * ## 根据竖表头最大层级生成默认列配置
  * @param maxLevel 最大层级
- * @param colName 列名
- * @returns
+ * @param colName 列名（字符串数组或单个字符串）
+ * @param colWidth 列宽度数组，第一个值为非末级宽度，第二个值为末级宽度
+ * @returns VxeGrid 列配置数组
  */
 export const getDefaultColumns = (
   maxLevel: number,
   colName: string[] | string = "",
-  colWidth: number[] = [120, 340],
+  colWidth: [number, number] = [120, 340],
 ): VxeGridPropTypes.Columns => {
-  let columns: VxeGridPropTypes.Columns = [];
-
-  for (let i = 1; i <= maxLevel; i++) {
-    let obj: VxeGridPropTypes.Column = {
-      field: `customField_${i}`,
+  // 使用 map 方法替代 for 循环，更简洁且函数式
+  return Array.from({ length: maxLevel }, (_, index) => {
+    const level = index + 1;
+    const isLastLevel = level === maxLevel;
+    
+    // 确定当前列的标题
+    let title = "";
+    if (Array.isArray(colName)) {
+      title = colName[index] || "";
+    } else if (typeof colName === "string") {
+      title = isLastLevel ? colName : "";
+    }
+    
+    return {
+      field: `customField_${level}`,
+      title,
       align: "center",
       fixed: "left",
-      width: i == maxLevel ? colWidth[1] : colWidth[0],
+      width: isLastLevel ? colWidth[1] : colWidth[0],
     };
-    if (colName instanceof Array) {
-      obj.title = colName[i - 1];
-    } else if (typeof colName === "string") {
-      obj.title = i == maxLevel ? colName : "";
-    }
-    columns.push(obj);
-  }
-
-  return columns;
+  });
 };

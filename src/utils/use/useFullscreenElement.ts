@@ -1,5 +1,22 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
+// 全屏某个元素
+export const fullScreenElement = (element: any) => {
+  const ele = document.querySelector(element);
+  if (ele.requestFullscreen) {
+    ele.requestFullscreen();
+  } else if (ele.mozRequestFullScreen) {
+    /* Firefox */
+    ele.mozRequestFullScreen();
+  } else if (ele.webkitRequestFullscreen) {
+    /* Chrome, Safari & Opera */
+    ele.webkitRequestFullscreen();
+  } else if (ele.msRequestFullscreen) {
+    /* IE/Edge */
+    ele.msRequestFullscreen();
+  }
+};
+
 /**
  * ## 退出全屏模式
  */

@@ -8,14 +8,13 @@
 import { ref, reactive, watch, nextTick } from 'vue';
 import { VxeColumnPropTypes, VxeGridInstance, VxeGridListeners, VxeGridProps, VxeTableDefines } from 'vxe-table';
 import { VxeInputProps } from 'vxe-pc-ui'
-import { findCellData, getDefaultColumns, processTableDataDynamic, TargetItem, transformTableDataToTargetFormat } from './tools';
+import { findCellData, getDefaultColumns, MergeConfigItem, processTableDataDynamic, TargetItem, transformTableDataToTargetFormat } from './tools';
 import { HeadItem, resTableDataItem } from './types';
+import { deepCopy } from '@/utils/common';
 
 const props = withDefaults(defineProps<{
   // 横/竖模式
   layout?: 'vertical' | 'horizontal'
-  // 是否编辑模式
-  isEdit: boolean;
   data?: {
     // 表格数据
     tableData: any[]
@@ -26,12 +25,16 @@ const props = withDefaults(defineProps<{
   };
   // 固定列标题
   colName?: string[] | string
+  // 固定列宽度
+  colWidth?: [number, number]
   // 结束单元格编辑的回调
   endEdit?: (data: { row: any, rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, resCellData: resTableDataItem | null }) => Promise<void>
   // 单元格是否能触发编辑
   cellEditSetting?: (data: { row: any, rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number }) => boolean
   // 自定义单元格类
   cellClassName?: (data: { row: any, rowIndex: number, $rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, $columnIndex: number }) => string
+  // 表格行列合并补充配置
+  mergeAddition?: (data: { column: VxeTableDefines.ColumnInfo<any>, rowData: any[], columnsLength: number[][] }) => MergeConfigItem[]
 }>(), {
   layout: 'vertical',
   isEdit: false,
@@ -41,7 +44,8 @@ const props = withDefaults(defineProps<{
       colHeads: [],
       rowHeads: []
     }
-  }
+  },
+  colWidth: () => [120, 340]
 })
 
 const gridRef = ref<VxeGridInstance<any>>()
@@ -67,7 +71,9 @@ const gridOptions = reactive<VxeGridProps<any>>({
 })
 
 // 是否编辑模式
-const _isEdit = ref<boolean>(props.isEdit)
+const _isEdit = defineModel<boolean>('isEdit', {
+  default: false
+})
 
 // 激活单元格编辑时保存的单元格旧数据
 const cellOldData = ref<string>('')
@@ -161,7 +167,7 @@ const initTable = async () => {
   const { rowData, mergeData, maxLevel } = processTableDataDynamic(props.layout == 'vertical' ? rowHeads : colHeads)
   // console.log(rowData, mergeData, maxLevel);
   // 获取默认列配置
-  const defaultColumns = getDefaultColumns(maxLevel, props.colName)
+  const defaultColumns = getDefaultColumns(maxLevel, props.colName, props.colWidth)
 
   // 完善列配置
   const _columns = flattenColumns(columns)
@@ -189,9 +195,12 @@ const initTable = async () => {
   gridOptions.data = rowData
   // console.log(gridOptions.data);
 
+  // 调用补充合并单元格配置
+  const mergeDataAddition = props.mergeAddition?.({ rowData, column: deepCopy(gridOptions.columns), columnsLength }) || []
+
   // 先清空合并状态，再设置合并单元格配置(不然合并渲染会有错误)
   await gridRef.value?.clearMergeCells()
-  gridOptions.mergeCells = mergeData
+  gridOptions.mergeCells = [...mergeData, ...mergeDataAddition]
 }
 
 // 监听表格数据更新
@@ -205,7 +214,7 @@ watch(() => props.layout, (newVal) => {
 })
 
 // 监听isEdit属性
-watch(() => props.isEdit, (newVal) => {
+watch(() => _isEdit.value, (newVal) => {
   _isEdit.value = newVal
   if (gridOptions.editConfig) {
     gridOptions.editConfig.enabled = newVal
@@ -214,6 +223,7 @@ watch(() => props.isEdit, (newVal) => {
 
 defineExpose({
   gridRef,
+  columnsFlat,
   exportExcel
 })
 

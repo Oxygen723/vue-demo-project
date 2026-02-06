@@ -38,6 +38,7 @@ app.mount("#app");
 | data                | object       | { tableData: [], colHeads: [], rowHeads: [] } | 表格数据                                                                                                                                   |
 | colName             | array/string | []                                            | 固定列标题                                                                                                                                 |
 | colWidth            | array        | [100, 100]                                    | 固定列宽度                                                                                                                                 |
+| size                | string       | 'medium'                                      | 表格尺寸，可选值：'mini'、'small'、'medium'、'large'                                                                                               |
 | endEdit             | function     | () => Promise.resolve()                       | 结束单元格编辑的回调，参数：{ row: any, rowIndex: number, column: ColumnInfo, columnIndex: number, resCellData: resTableDataItem \| null } |
 | cellEditSetting     | function     | () => true                                    | 单元格是否能触发编辑，参数：{ row: any, rowIndex: number, column: ColumnInfo, columnIndex: number }                                        |
 | cellClassName       | function     | () => ''                                      | 自定义单元格类，参数：{ row: any, rowIndex: number, $rowIndex: number, column: ColumnInfo, columnIndex: number, $columnIndex: number }     |

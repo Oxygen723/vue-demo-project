@@ -66,7 +66,7 @@ const cellClassName = ({ row, rowIndex, $rowIndex, column, columnIndex, $columnI
 
 // 单元格结束编辑事件
 const endEditAction = async ({ row, rowIndex, column, columnIndex, resCellData }: any) => {
-  console.log(resCellData);
+  console.log(resCellData, row);
 
 }
 
@@ -114,7 +114,7 @@ const getTableData = async () => {
 }
 
 onBeforeMount(() => {
-  const authorization = 'QJ1qkyvDxaFkixHxO0wI6uw0KvGU4No16xozORJsq1eeM6KSlqtVidqorkEH33ar3YEHAyfYAKMpUVeoAWTaOkcx85UtK5AS3InoP8c9TRCIo1H2EcSRzxyXtutLlgbV'
+  const authorization = 'tG7Y8yyAJAQCcl8zpCXCrVveko5hbJP8SbT4UaVaAwQePoWBJft4fUjPgAwKHhQ3b2dnfj6tAj5gFD6OVLIy1IFIHpONeNKW5OptmxZ3vV469JTuvORz2U6mhC0iViGQ'
   sessionStorage.setItem('authorization', authorization)
 })
 

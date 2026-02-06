@@ -7,13 +7,14 @@
 <script setup lang="ts" name="评优表格组件">
 import { ref, reactive, watch, nextTick } from 'vue';
 import { VxeColumnPropTypes, VxeGridInstance, VxeGridListeners, VxeGridProps, VxeTableDefines } from 'vxe-table';
-import { VxeInputProps } from 'vxe-pc-ui'
+import { VxeComponentSizeType, VxeInputProps } from 'vxe-pc-ui'
 import { deepCopy, findCellData, getDefaultColumns, MergeConfigItem, processTableDataDynamic, TargetItem, transformTableDataToTargetFormat } from './tools';
 import { HeadItem, resTableDataItem } from './types';
 
 const props = withDefaults(defineProps<{
   // 横/竖模式
   layout?: 'vertical' | 'horizontal'
+  size?: VxeComponentSizeType
   data?: {
     // 表格数据
     tableData: any[]
@@ -30,9 +31,9 @@ const props = withDefaults(defineProps<{
   endEdit?: (data: { row: any, rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, resCellData: resTableDataItem | null }) => Promise<void>
   // 单元格是否能触发编辑
   cellEditSetting?: (data: { row: any, rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number }) => boolean
-  // 自定义单元格类
+  // 自定义单元格类名
   cellClassName?: (data: { row: any, rowIndex: number, $rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, $columnIndex: number }) => string
-  // 自定义表头类
+  // 自定义表头类名
   headerCellClassName?: (data: { $rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, $columnIndex: number }) => string
   // 表格行列合并补充配置
   mergeAddition?: (data: { column: VxeTableDefines.ColumnInfo<any>, rowData: any[], columnsLength: number[][] }) => MergeConfigItem[]
@@ -47,7 +48,7 @@ const props = withDefaults(defineProps<{
     }
   },
   colWidth: () => [120, 340]
-})
+}) 
 
 const gridRef = ref<VxeGridInstance<any>>()
 
@@ -55,6 +56,7 @@ const gridRef = ref<VxeGridInstance<any>>()
 const gridOptions = reactive<VxeGridProps<any>>({
   border: true,
   height: '100%',
+  size: props.size,
   headerCellClassName: ({ $rowIndex, column, columnIndex, $columnIndex }) => {
     let defaultClass = 'ALPH';
     const newClass = props.headerCellClassName?.({ $rowIndex, column, columnIndex, $columnIndex }) ?? ''
@@ -118,7 +120,7 @@ const gridEvents: VxeGridListeners<any> = {
 }
 
 /**
- * ## 导出表格数据
+ * ## 导出excel表格数据
  * @param filename 文件名
  */
 const exportExcel = async (filename: string) => {

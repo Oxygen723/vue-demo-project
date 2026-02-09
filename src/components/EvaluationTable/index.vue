@@ -1,6 +1,13 @@
 <template>
   <div class="evaluation-table w-100% h-100%">
     <VxeGrid ref="gridRef" v-bind="gridOptions" v-on="gridEvents">
+      <template #headerSlot="{ column }">
+        <vxe-tooltip :content="column.title" placement="top">
+          <span class="custom-header">
+            {{ column.title }}
+          </span>
+        </vxe-tooltip>
+      </template>
     </VxeGrid>
   </div>
 </template>
@@ -14,6 +21,7 @@ import { HeadItem, resTableDataItem } from './types';
 const props = withDefaults(defineProps<{
   // 横/竖模式
   layout?: 'vertical' | 'horizontal'
+  // 表格大小
   size?: VxeComponentSizeType
   data?: {
     // 表格数据
@@ -26,7 +34,11 @@ const props = withDefaults(defineProps<{
   // 固定列标题
   colName?: string[] | string
   // 固定列宽度
-  colWidth?: [number, number]
+  colWidth?: number[]
+  // 行最大合并层级
+  maxMergeLevel?: number
+  // 行节点ID使用的层级
+  nodeIdLevel?: number
   // 结束单元格编辑的回调
   endEdit?: (data: { row: any, rowIndex: number, column: VxeTableDefines.ColumnInfo<any>, columnIndex: number, resCellData: resTableDataItem | null }) => Promise<void>
   // 单元格是否能触发编辑
@@ -47,9 +59,10 @@ const props = withDefaults(defineProps<{
       rowHeads: []
     }
   },
-  colWidth: () => [120, 340]
-}) 
+  colWidth: () => [120, 120, 340]
+})
 
+// grid表格实例
 const gridRef = ref<VxeGridInstance<any>>()
 
 // grid表格配置
@@ -62,7 +75,6 @@ const gridOptions = reactive<VxeGridProps<any>>({
     const newClass = props.headerCellClassName?.({ $rowIndex, column, columnIndex, $columnIndex }) ?? ''
     return defaultClass + ' ' + newClass
   },
-  showHeaderOverflow: true,
   cellClassName: 'ALPH',
   editConfig: {
     trigger: 'dblclick',
@@ -75,6 +87,9 @@ const gridOptions = reactive<VxeGridProps<any>>({
   columns: [],
   data: [],
   mergeCells: [],
+  columnConfig: {
+    resizable: true,
+  },
 })
 
 // 是否编辑模式
@@ -94,14 +109,14 @@ const gridEvents: VxeGridListeners<any> = {
   },
   // 单元格编辑结束
   async editClosed({ row, rowIndex, column, columnIndex }) {
-    const horizontalIds = props.layout == 'vertical' ? column.field?.split('_')[1] as string : row.id.toString()
-    const sideIds = props.layout == 'vertical' ? row.id.toString() : column.field?.split('_')[1] as string
+    const horizontalIds = props.layout == 'horizontal' ? row.id.toString() : column.field?.split('_')[1] as string
+    const sideIds = props.layout == 'horizontal' ? column.field?.split('_')[1] as string : row.id.toString()
     const resCellData = findCellData(props.data?.tableData, {
       horizontalIds,
       sideIds,
     });
     const oldValue = cellOldData.value
-    // 判断是否有修改
+    // 判断单元格是否有更新
     if (row[column.field] == oldValue) return;
 
     if (!props.endEdit) return true;
@@ -119,7 +134,7 @@ const gridEvents: VxeGridListeners<any> = {
   }
 }
 
-/**
+/** 
  * ## 导出excel表格数据
  * @param filename 文件名
  */
@@ -171,27 +186,26 @@ function flattenColumns(items: TargetItem[]): TargetItem[] {
 const initTable = async () => {
   const { tableData, colHeads, rowHeads } = props.data;
   // 格式化表格列配置
-  const { data: columns, lengths: columnsLength } = transformTableDataToTargetFormat(props.layout == 'vertical' ? colHeads : rowHeads)
-  // console.log(columns, columnsLength);
+  const { data: columns, lengths: columnsLength } = transformTableDataToTargetFormat(props.layout == 'horizontal' ? colHeads : rowHeads)
+  // console.log(columns);
   // 格式化表格行配置
-  const { rowData, mergeData, maxLevel } = processTableDataDynamic(props.layout == 'vertical' ? rowHeads : colHeads)
-  // console.log(rowData, mergeData, maxLevel);
+  const { rowData, mergeData, maxLevel } = processTableDataDynamic(props.layout == 'horizontal' ? rowHeads : colHeads, props.maxMergeLevel, props.nodeIdLevel)
+  // console.log(rowData);
   // 获取默认列配置
   const defaultColumns = getDefaultColumns(maxLevel, props.colName, props.colWidth)
-
   // 完善列配置
   const _columns = flattenColumns(columns)
-
   // 完善行配置(赋值单元格数据)
   rowData.forEach((item) => {
     columnsFlat.forEach((itm) => {
       if (itm.field) { // 添加字段存在性检查
-        const horizontalIds = props.layout == 'vertical' ? itm.field?.split('_')[1] as string : item.id.toString()
-        const sideIds = props.layout == 'vertical' ? item.id.toString() : itm.field?.split('_')[1] as string
+        const horizontalIds = props.layout == 'horizontal' ? item.id.toString() : itm.field?.split('_')[1] as string
+        const sideIds = props.layout == 'horizontal' ? itm.field?.split('_')[1] as string : item.id.toString()
         const cellData = findCellData(tableData, {
           horizontalIds,
           sideIds,
         });
+
         item[itm.field] = cellData?.data || ''
       }
     })
@@ -228,6 +242,7 @@ watch(() => _isEdit.value, (newVal) => {
   _isEdit.value = newVal
   if (gridOptions.editConfig) {
     gridOptions.editConfig.enabled = newVal
+    initTable()
   }
 }, { immediate: true })
 
@@ -271,5 +286,16 @@ defineExpose({
       border: 1px solid var(--cell-disabled-edit-borderColor) !important;
     }
   }
+}
+
+.custom-header {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.4;
+  max-height: 5.6em;
 }
 </style>

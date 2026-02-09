@@ -13,7 +13,7 @@
     </div>
     <div class="table-main w-100% h-[calc(100%-32px)]">
       <Loading v-if="loading"></Loading>
-      <EvaluationTable ref="EvaluationTableRef" v-model:isEdit="edit" :layout="tableLayout" :col-name="'姓名'"
+      <EvaluationTable ref="EvaluationTableRef" v-model:isEdit="edit" :layout="tableLayout" :col-name="colTitle"
         :data="table" :cell-edit-setting="cellEditSettingAction" :cell-class-name="cellClassName"
         :end-edit="endEditAction" :mergeAddition="mergeAdditionAction">
       </EvaluationTable>
@@ -21,13 +21,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeMount } from 'vue';
+import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
 import EvaluationTable from '@/components/EvaluationTable/index.vue'
 import { getTable, TableItem } from '@/services/api/process';
-import { CURRENT_DATE } from '@/utils/common';
+import { CURRENT_DATE, deepCopy } from '@/utils/common';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading/index.vue'
 import { useFullscreenElement, fullScreenElement, exitFullScreen } from '@/utils/use/useFullscreenElement';
+import { getLeafNodes } from '@/components/EvaluationTable/tools';
 
 const { isFullView } = useFullscreenElement()
 
@@ -45,22 +46,30 @@ const table = reactive({
 
 const tableLayout = ref<'vertical' | 'horizontal'>('vertical')
 
-const fullAction = () => {
-  if (EvaluationTableRef.value) {
-    EvaluationTableRef.value.gridRef.zoom()
-  }
-}
+// 表格动态列配置
+const colTitle = computed(() => {
+  return tableLayout.value == 'vertical' ? '评判标准' : ['分区', '部门', '姓名']
+})
 
 // 单元格编辑配置
-const cellEditSettingAction = ({ rowIndex }: any) => {
-  if (rowIndex == 0) return false
-  else return true
+const cellEditSettingAction = ({ rowIndex, columnIndex }: any) => {
+  if (tableLayout.value == 'horizontal') {
+    if (rowIndex <= 1) return false
+    else return true
+  } else {
+    if (columnIndex == 3 || columnIndex == 4) return false
+    else return true
+  }
 }
 
 // 单元格样式配置
 const cellClassName = ({ row, rowIndex, $rowIndex, column, columnIndex, $columnIndex }: any) => {
   let className = ''
-  if (rowIndex == 0) className = 'disabled-edit'
+  if (tableLayout.value == 'horizontal') {
+    if (rowIndex <= 1) className = 'disabled-edit text-#FF0000'
+  } else {
+    if ($columnIndex == 3 || $columnIndex == 4) className = 'disabled-edit text-#FF0000'
+  }
   return className
 }
 
@@ -81,7 +90,7 @@ const mergeAdditionAction = ({ column, rowData, columnsLength }: any) => {
       if (dayjs(dealDate.value).format('YYYY-MM') < '2025-11') {
         mergeAddition.push({
           row: _同分对比结果rowIdx,
-          col: 3,
+          col: 5,
           rowspan: 1,
           colspan: EvaluationTableRef.value.columnsFlat.length
         })
@@ -89,7 +98,7 @@ const mergeAdditionAction = ({ column, rowData, columnsLength }: any) => {
         columnsLength.forEach((item: any) => {
           mergeAddition.push({
             row: _同分对比结果rowIdx,
-            col: 3 + item[0],
+            col: 5 + item[0],
             rowspan: 1,
             colspan: item[1]
           })
@@ -107,14 +116,54 @@ const getTableData = async () => {
   loading.value = false;
   if (res.code === 200) {
     const data = res.data;
-    table.tableData = data.tableData;
-    table.colHeads = data.tableRowHeads;
-    table.rowHeads = data.tableColHeads;
+    let tableData = deepCopy(data.tableData);
+    let colHeads = deepCopy(data.tableColHeads);
+    let rowHeads = deepCopy(data.tableRowHeads);
+
+    let flattenCol = getLeafNodes(colHeads)
+    let flattenRow = getLeafNodes(rowHeads)
+
+    const _备注ID = Number((Math.random() * 100000).toFixed(0))
+    const _满分值 = Number((Math.random() * 100000).toFixed(0))
+    if (tableLayout.value == 'vertical') {
+      rowHeads.unshift({ id: _备注ID, level: 1, name: '备注', parentId: null })
+      rowHeads.unshift({ id: _满分值, level: 1, name: '满分值', parentId: null })
+      flattenCol.forEach(i => {
+        tableData.push({
+          data: i.id,
+          horizontalIds: _备注ID,
+          sideIds: i.id
+        })
+        tableData.push({
+          data: i.id,
+          horizontalIds: _满分值,
+          sideIds: i.id
+        })
+      })
+    } else {
+      colHeads.unshift({ id: _备注ID, level: 1, name: '备注', parentId: null })
+      colHeads.unshift({ id: _满分值, level: 1, name: '满分值', parentId: null })
+      flattenRow.forEach(i => {
+        tableData.push({
+          data: i.id,
+          horizontalIds: i.id,
+          sideIds: _备注ID
+        })
+        tableData.push({
+          data: i.id,
+          horizontalIds: i.id,
+          sideIds: _满分值
+        })
+      })
+    }
+    table.colHeads = colHeads;
+    table.rowHeads = rowHeads;
+    table.tableData = tableData;
   }
 }
 
 onBeforeMount(() => {
-  const authorization = 'tG7Y8yyAJAQCcl8zpCXCrVveko5hbJP8SbT4UaVaAwQePoWBJft4fUjPgAwKHhQ3b2dnfj6tAj5gFD6OVLIy1IFIHpONeNKW5OptmxZ3vV469JTuvORz2U6mhC0iViGQ'
+  const authorization = 'Jnj9LjgwhApEGwcmqp3q3UxUsQYGwK64IO8u42LQoUkbz0xeQNiGbwWhxuVJEE0aubWjiw2uisJnOXsoFISzN1QRWZIrZCTN2aR8VfIpvAbAk3lQAeiD6s0azPts4USP'
   sessionStorage.setItem('authorization', authorization)
 })
 

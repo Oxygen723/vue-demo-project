@@ -71,14 +71,17 @@ export const findCellData = (
   return (
     resTableData.find(
       (item) =>
-        item.horizontalIds === cell.horizontalIds &&
-        item.sideIds === cell.sideIds,
+        item.horizontalIds == cell.horizontalIds &&
+        item.sideIds == cell.sideIds,
     ) || null
   );
 };
 
 export interface TargetItem extends VxeColumnProps {
   subarea?: string;
+  slots?: {
+    header?: string;
+  };
   children?: TargetItem[];
 }
 
@@ -148,15 +151,18 @@ export function transformTableDataToTargetFormat(data: TableItem[]): {
 } {
   let dataLengths: number[][] = [];
   // 先按 sortRank 排序，确保顺序一致
-  const sortData = (items: TableItem[]): TableItem[] => {
-    return [...items].sort((a, b) => a.sortRank - b.sortRank);
-  };
+  // const sortData = (items: TableItem[]): TableItem[] => {
+  //   return [...items].sort((a, b) => a.sortRank - b.sortRank);
+  // };
 
   let currentLength = 0;
   const transformNode = (node: TableItem, subarea: string): TargetItem => {
     const result: TargetItem = {
       title: node.name,
       align: "center",
+      slots: {
+        header: "headerSlot", // 使用自定义表头插槽
+      },
     };
     // 如果有子节点
     if (node.children && node.children.length > 0) {
@@ -210,7 +216,11 @@ export interface ProcessedResult {
  * @param data 树形结构的表头数据
  * @returns 处理后的表格数据和合并配置
  */
-export function processTableDataDynamic(data: TableItem[]): ProcessedResult {
+export function processTableDataDynamic(
+  data: TableItem[],
+  maxMergeLevel?: number,
+  nodeIdLevel?: number,
+): ProcessedResult {
   const rowData: RowDataItem[] = [];
   const mergeData: MergeConfigItem[] = [];
 
@@ -288,7 +298,9 @@ export function processTableDataDynamic(data: TableItem[]): ProcessedResult {
   function getColspan(node: TableItem): number {
     if (!node.children || node.children.length === 0) {
       // 叶子节点：跨列数 = 总列数 - 当前层级 + 1
-      return maxLevel - (node.level - 1);
+      return maxMergeLevel
+        ? maxMergeLevel - (node.level - 1)
+        : maxLevel - (node.level - 1);
     }
     return 1;
   }
@@ -298,8 +310,17 @@ export function processTableDataDynamic(data: TableItem[]): ProcessedResult {
     if (!node.children || node.children.length === 0) {
       // 只处理叶子节点
       const ancestors = getAncestorChain(node);
+      // 从祖先链中找到对应level的节点id
+      let targetId = node.id as number;
+      const targetNode = ancestors.find(
+        (ancestor) => ancestor.level === nodeIdLevel,
+      );
+      if (targetNode) {
+        targetId = targetNode.id as number;
+      }
+
       const rowItem: RowDataItem = {
-        id: node.id as number,
+        id: targetId,
       } as RowDataItem;
 
       // 动态创建字段 - 根据最大层级创建相应数量的字段
@@ -430,13 +451,13 @@ export function processTableDataDynamic(data: TableItem[]): ProcessedResult {
  * ## 根据竖表头最大层级生成默认列配置
  * @param maxLevel 最大层级
  * @param colName 列名（字符串数组或单个字符串）
- * @param colWidth 列宽度数组，第一个值为非末级宽度，第二个值为末级宽度
+ * @param colWidth 列宽度数组
  * @returns VxeGrid 列配置数组
  */
 export const getDefaultColumns = (
   maxLevel: number,
   colName: string[] | string = "",
-  colWidth: [number, number] = [120, 340],
+  colWidth: number[] = [120, 120, 340],
 ): VxeGridPropTypes.Columns => {
   // 使用 map 方法替代 for 循环，更简洁且函数式
   return Array.from({ length: maxLevel }, (_, index) => {
@@ -456,7 +477,28 @@ export const getDefaultColumns = (
       title,
       align: "center",
       fixed: "left",
-      width: isLastLevel ? colWidth[1] : colWidth[0],
+      width: colWidth[index],
     };
   });
 };
+
+// 只返回树形结构中的最里层叶子节点
+export const getLeafNodes = (tree: TableItem[]): TableItem[] => {
+  const result: TableItem[] = []
+  
+  const traverse = (nodes: TableItem[]) => {
+    nodes.forEach(node => {
+      // 检查是否为叶子节点（没有子节点或子节点为空）
+      if (!node.children || node.children.length === 0) {
+        // 是叶子节点，添加到结果数组
+        result.push(node)
+      } else {
+        // 不是叶子节点，递归处理子节点
+        traverse(node.children)
+      }
+    })
+  }
+  
+  traverse(tree)
+  return result
+}
